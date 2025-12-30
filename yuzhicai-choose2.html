@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>预制菜问答2 - iframe适配版</title>
+    <style>
+        /* iframe核心适配：移除默认边距、禁止滚动、透明背景 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent; /* iframe背景透明，融入父页面 */
+            font-family: 'Microsoft Yahei', sans-serif;
+        }
+        * {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <!-- 外层容器：适配iframe尺寸，强制显示 -->
+    <div class="pre-made-food-question" style="width: 100%; max-width: 600px; padding: 15px; position: relative; z-index: 9999; margin: 0 auto;">
+        <!-- 题目 -->
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #333;">
+            2、餐饮店使用预制菜，是否必须提前告知消费者？
+        </div>
+
+        <!-- 选项容器 -->
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; align-items: flex-start;">
+            <!-- 选项A -->
+            <div id="optA" style="
+                padding: 12px 16px;
+                background: #FFE680;
+                border-radius: 6px;
+                font-size: 14px;
+                color: #333;
+                cursor: pointer;
+                width: fit-content;
+                min-width: 280px;
+                box-sizing: border-box;
+                transition: background 0.2s ease;
+            ">A. 法律强制要求必须告知</div>
+
+            <!-- 选项B -->
+            <div id="optB" style="
+                padding: 12px 16px;
+                background: #FFE680;
+                border-radius: 6px;
+                font-size: 14px;
+                color: #333;
+                cursor: pointer;
+                width: fit-content;
+                min-width: 280px;
+                box-sizing: border-box;
+                transition: background 0.2s ease;
+            ">B. 没有明确规定，全看商家自觉</div>
+
+            <!-- 选项C -->
+            <div id="optC" style="
+                padding: 12px 16px;
+                background: #FFE680;
+                border-radius: 6px;
+                font-size: 14px;
+                color: #333;
+                cursor: pointer;
+                width: fit-content;
+                min-width: 280px;
+                box-sizing: border-box;
+                transition: background 0.2s ease;
+            ">C. 只有高端餐厅需要告知</div>
+        </div>
+
+        <!-- 解析框：优化样式，提升可读性 -->
+        <div id="analysis-box" style="
+            display: none;
+            padding: 12px 16px;
+            background: #F5F5F5;
+            border-radius: 6px;
+            font-size: 12px; /* 原9px过小，适配iframe可读性 */
+            color: #555;
+            width: 100%; /* 适配iframe宽度，替换fit-content */
+            min-width: 280px;
+            box-sizing: border-box;
+            margin-top: 10px;
+            z-index: 9999;
+            position: relative;
+            line-height: 1.5;
+        ">
+            正确答案：B  解析：目前我国暂无全国性法律强制要求餐饮店使用预制菜必须提前告知消费者，仅部分地方出台相关指引（如浙江、广东等地鼓励商家明示），告知义务主要依赖商家自觉；“法律强制”“仅高端餐厅需要”的说法均无明确法律依据。
+        </div>
+    </div>
+
+    <!-- iframe适配脚本：保留交互+高度自适应 -->
+    <script>
+        // 发送iframe高度到父窗口（适配高度变化）
+        function sendIframeHeight() {
+            const container = document.querySelector('.pre-made-food-question');
+            const height = container.offsetHeight + 20; // 预留边距
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'quiz2IframeHeight',
+                    height: height
+                }, '*'); // 生产环境替换为你的域名（如https://liaokangxian.github.io）
+            }
+        }
+
+        // 问答核心逻辑
+        var answered = false;
+        window.addEventListener('load', function() {
+            // 多次获取元素，兜底iframe渲染延迟
+            var optA = document.getElementById('optA') || document.querySelector('#optA');
+            var optB = document.getElementById('optB') || document.querySelector('#optB');
+            var optC = document.getElementById('optC') || document.querySelector('#optC');
+            var analysis = document.getElementById('analysis-box') || document.querySelector('#analysis-box');
+
+            // 兜底排查
+            if (!optA || !optB || !optC || !analysis) {
+                console.log('元素查找失败：', {
+                    optA: optA,
+                    optB: optB,
+                    optC: optC,
+                    analysis: analysis
+                });
+                return; // 避免报错中断执行
+            }
+
+            // 悬停效果
+            optA.onmouseover = function() { if (!answered) this.style.background = '#FFD640'; };
+            optA.onmouseout = function() { if (!answered) this.style.background = '#FFE680'; };
+            optB.onmouseover = function() { if (!answered) this.style.background = '#FFD640'; };
+            optB.onmouseout = function() { if (!answered) this.style.background = '#FFE680'; };
+            optC.onmouseover = function() { if (!answered) this.style.background = '#FFD640'; };
+            optC.onmouseout = function() { if (!answered) this.style.background = '#FFE680'; };
+
+            // 点击逻辑封装，简化代码
+            const handleOptionClick = (el, isCorrect) => {
+                if (answered) return;
+                answered = true;
+                el.style.background = isCorrect ? '#80E680' : '#FF8080';
+                el.style.color = '#FFF';
+                // 强制显示解析
+                analysis.style.display = 'block';
+                // 解析显示后重新计算iframe高度
+                sendIframeHeight();
+            };
+
+            // 绑定点击事件
+            optA.onclick = () => handleOptionClick(optA, false);
+            optB.onclick = () => handleOptionClick(optB, true);
+            optC.onclick = () => handleOptionClick(optC, false);
+
+            // 初始发送高度
+            sendIframeHeight();
+        }, false);
+
+        // 窗口大小变化时重新计算高度
+        window.addEventListener('resize', sendIframeHeight);
+    </script>
+</body>
+</html>
