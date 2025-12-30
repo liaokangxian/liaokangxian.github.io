@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2023-2024食堂制作方式对比</title>
+    <script src="https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #fff; }
+        .tip { text-align: center; color: #666; font-size: 14px; margin: 10px 0; }
+        #chart { width: 100%; height: 480px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="tip">点击饼图切换 2023 ↔ 2024 年数据</div>
+    <div id="chart"></div>
+
+    <script>
+        // 自适应iframe尺寸初始化图表
+        function initChart() {
+            const myChart = echarts.init(document.getElementById('chart'));
+            let currentYear = 2023;
+
+            function getChartOption(year) {
+                const titleText = year === 2023 
+                    ? '2023年中国学校饭堂食物制作方式调查' 
+                    : '2024年中国学校饭堂的食物制作方式';
+                const data = year === 2023 
+                    ? [
+                        { name: '饭堂的中央厨房统一配餐的预制菜品', value: 59.19, itemStyle: { color: '#FFD700' } },
+                        { name: '饭堂现炒菜品', value: 37.58, itemStyle: { color: '#FF8C00' } },
+                        { name: '不清楚', value: 3.23, itemStyle: { color: '#90EE90' } }
+                      ]
+                    : [
+                        { name: '饭堂的中央厨房统一配餐的预制菜品', value: 54.55, itemStyle: { color: '#FFD700' } },
+                        { name: '饭堂现炒菜品', value: 40.72, itemStyle: { color: '#FF8C00' } },
+                        { name: '不清楚', value: 4.73, itemStyle: { color: '#90EE90' } }
+                      ];
+
+                return {
+                    title: { text: titleText, left: 'top', textStyle: { fontSize: 16, fontWeight: 'normal' } },
+                    tooltip: { trigger: 'item', formatter: '{b}: {c}%' },
+                    legend: { show: false },
+                    series: [{
+                        name: '制作方式',
+                        type: 'pie',
+                        radius: ['40%', '60%'],
+                        center: ['50%', '50%'],
+                        data: data,
+                        label: {
+                            show: true,
+                            position: 'outside',
+                            formatter: '{b}: {c}',
+                            textStyle: { fontSize: 12, color: '#333' },
+                            lineStyle: { color: '#999' }
+                        },
+                        animationDuration: 800,
+                        animationEasing: 'cubicInOut'
+                    }],
+                    graphic: [
+                        { type: 'text', left: '10%', top: '15%', style: { text: '单位: %', fontSize: 12, fill: '#666' } },
+                        { type: 'text', left: '10%', bottom: '10%', style: { text: '数据来源：艾媒草莓派数据调查与计算系统', fontSize: 12, fill: '#666' } }
+                    ]
+                };
+            }
+
+            myChart.setOption(getChartOption(2023));
+            myChart.on('click', () => {
+                currentYear = currentYear === 2023 ? 2024 : 2023;
+                myChart.setOption(getChartOption(currentYear));
+            });
+
+            // 监听窗口大小变化（适配iframe缩放）
+            window.addEventListener('resize', () => myChart.resize());
+        }
+
+        // 确保DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initChart);
+    </script>
+</body>
+</html>
