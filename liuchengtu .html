@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预制菜生产环节耗时图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: transparent; /* 适配iframe透明背景 */
+            overflow: hidden; /* 防止iframe内滚动 */
+        }
+        .process-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto; /* 移除上下外边距，由iframe控制 */
+            padding: 10px; /* 减小内边距适配iframe */
+            position: relative;
+            height: 100%;
+        }
+        /* 标题 */
+        .process-title {
+            font-size: 16px; /* 微调字号适配iframe */
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        /* 垂直主线 */
+        .process-line {
+            position: absolute;
+            left: 50%;
+            top: 40px;
+            bottom: 30px;
+            width: 2px;
+            background: #ddd;
+            transform: translateX(-50%);
+        }
+        /* 环节项容器 */
+        .process-item {
+            display: flex;
+            align-items: center;
+            margin: 20px 0; /* 减小间距适配iframe */
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        /* 序号圆点 */
+        .item-dot {
+            width: 26px; /* 微调圆点大小 */
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: transform 0.3s ease;
+        }
+        .dot-orange { background: #FF9F43; }
+        .dot-green { background: #10B981; }
+        /* 左侧内容 */
+        .item-left {
+            width: 50%;
+            text-align: right;
+            padding-right: 35px;
+            transition: all 0.3s ease;
+        }
+        /* 右侧内容 */
+        .item-right {
+            width: 50%;
+            text-align: left;
+            padding-left: 35px;
+            transition: all 0.3s ease;
+        }
+        .item-name {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 3px;
+            transition: all 0.3s ease;
+        }
+        .item-time {
+            font-size: 12px;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+        /* 悬停效果 */
+        .process-item:hover .item-dot {
+            transform: translateX(-50%) scale(1.3);
+        }
+        .process-item:hover .item-name {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        .process-item:hover .item-time {
+            font-size: 14px;
+            color: #666;
+        }
+        /* 数据来源 */
+        .process-source {
+            font-size: 11px;
+            color: #999;
+            margin-top: 15px;
+            text-align: center;
+        }
+        /* 响应式适配（强化iframe小尺寸适配） */
+        @media (max-width: 480px) {
+            .item-left { padding-right: 20px; }
+            .item-right { padding-left: 20px; }
+            .item-name { font-size: 11px; }
+            .item-time { font-size: 10px; }
+            .process-item:hover .item-name { font-size: 12px; }
+            .process-item:hover .item-time { font-size: 12px; }
+            .process-title { font-size: 14px; }
+            .item-dot { width: 22px; height: 22px; font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="process-container">
+        <div class="process-title">预制菜生产各环节以及耗时</div>
+        <div class="process-line"></div>
+
+        <!-- 环节1：原料清洗切配 -->
+        <div class="process-item">
+            <div class="item-left">
+                <div class="item-name">原料清洗切配</div>
+                <div class="item-time">8min</div>
+            </div>
+            <div class="item-dot dot-orange">1</div>
+            <div class="item-right"></div>
+        </div>
+
+        <!-- 环节2：调味腌制 -->
+        <div class="process-item">
+            <div class="item-left"></div>
+            <div class="item-dot dot-green">2</div>
+            <div class="item-right">
+                <div class="item-name">调味腌制</div>
+                <div class="item-time">45min</div>
+            </div>
+        </div>
+
+        <!-- 环节3：烹饪加工 -->
+        <div class="process-item">
+            <div class="item-left">
+                <div class="item-name">烹饪加工</div>
+                <div class="item-time">30min</div>
+            </div>
+            <div class="item-dot dot-orange">3</div>
+            <div class="item-right"></div>
+        </div>
+
+        <!-- 环节4：冷却降温 -->
+        <div class="process-item">
+            <div class="item-left"></div>
+            <div class="item-dot dot-green">4</div>
+            <div class="item-right">
+                <div class="item-name">冷却降温</div>
+                <div class="item-time">20min</div>
+            </div>
+        </div>
+
+        <!-- 环节5：分装包装 -->
+        <div class="process-item">
+            <div class="item-left">
+                <div class="item-name">分装包装</div>
+                <div class="item-time">10min</div>
+            </div>
+            <div class="item-dot dot-orange">5</div>
+            <div class="item-right"></div>
+        </div>
+
+        <!-- 环节6：杀菌锁鲜 -->
+        <div class="process-item">
+            <div class="item-left"></div>
+            <div class="item-dot dot-green">6</div>
+            <div class="item-right">
+                <div class="item-name">杀菌锁鲜</div>
+                <div class="item-time">15min</div>
+            </div>
+        </div>
+
+        <!-- 环节7：仓储物流准备 -->
+        <div class="process-item">
+            <div class="item-left">
+                <div class="item-name">仓储物流准备</div>
+                <div class="item-time"></div>
+            </div>
+            <div class="item-dot dot-orange">7</div>
+            <div class="item-right"></div>
+        </div>
+
+        <div class="process-source">数据来源:中国烹饪协会《预制菜生产标准规范》</div>
+    </div>
+
+    <!-- 新增：适配iframe尺寸调整（可选） -->
+    <script>
+        // 监听iframe尺寸变化，确保内容适配
+        window.addEventListener('resize', function() {
+            const container = document.querySelector('.process-container');
+            container.style.height = window.innerHeight + 'px';
+        });
+        // 初始化尺寸
+        window.dispatchEvent(new Event('resize'));
+    </script>
+</body>
+</html>
