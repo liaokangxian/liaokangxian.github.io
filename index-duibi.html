@@ -7,8 +7,10 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #fff; }
-        .tip { text-align: center; color: #666; font-size: 14px; margin: 10px 0; }
-        #chart { width: 100%; height: 480px; cursor: pointer; }
+        /* 提示文字缩小+间距减少 */
+        .tip { text-align: center; color: #666; font-size: 12px; margin: 5px 0; }
+        /* 图表高度大幅缩小（原480→280） */
+        #chart { width: 100%; height: 280px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -16,7 +18,6 @@
     <div id="chart"></div>
 
     <script>
-        // 自适应iframe尺寸初始化图表
         function initChart() {
             const myChart = echarts.init(document.getElementById('chart'));
             let currentYear = 2023;
@@ -27,39 +28,43 @@
                     : '2024年中国学校饭堂的食物制作方式';
                 const data = year === 2023 
                     ? [
-                        { name: '饭堂的中央厨房统一配餐的预制菜品', value: 59.19, itemStyle: { color: '#FFD700' } },
+                        { name: '中央厨房预制菜品', value: 59.19, itemStyle: { color: '#FFD700' } },
                         { name: '饭堂现炒菜品', value: 37.58, itemStyle: { color: '#FF8C00' } },
                         { name: '不清楚', value: 3.23, itemStyle: { color: '#90EE90' } }
                       ]
                     : [
-                        { name: '饭堂的中央厨房统一配餐的预制菜品', value: 54.55, itemStyle: { color: '#FFD700' } },
+                        { name: '中央厨房预制菜品', value: 54.55, itemStyle: { color: '#FFD700' } },
                         { name: '饭堂现炒菜品', value: 40.72, itemStyle: { color: '#FF8C00' } },
                         { name: '不清楚', value: 4.73, itemStyle: { color: '#90EE90' } }
                       ];
 
                 return {
-                    title: { text: titleText, left: 'top', textStyle: { fontSize: 16, fontWeight: 'normal' } },
+                    // 标题字体缩小（原16→12）+ 位置微调
+                    title: { text: titleText, left: 'top', textStyle: { fontSize: 12, fontWeight: 'normal' } },
                     tooltip: { trigger: 'item', formatter: '{b}: {c}%' },
                     legend: { show: false },
                     series: [{
                         name: '制作方式',
                         type: 'pie',
-                        radius: ['40%', '60%'],
+                        // 饼图半径缩小（原40%/60%→30%/50%）
+                        radius: ['30%', '50%'],
                         center: ['50%', '50%'],
                         data: data,
                         label: {
                             show: true,
                             position: 'outside',
                             formatter: '{b}: {c}',
-                            textStyle: { fontSize: 12, color: '#333' },
+                            // 标签字体缩小（原12→10）
+                            textStyle: { fontSize: 10, color: '#333' },
                             lineStyle: { color: '#999' }
                         },
                         animationDuration: 800,
                         animationEasing: 'cubicInOut'
                     }],
                     graphic: [
-                        { type: 'text', left: '10%', top: '15%', style: { text: '单位: %', fontSize: 12, fill: '#666' } },
-                        { type: 'text', left: '10%', bottom: '10%', style: { text: '数据来源：艾媒草莓派数据调查与计算系统', fontSize: 12, fill: '#666' } }
+                        // 单位/来源文字缩小（原12→10）+ 位置微调
+                        { type: 'text', left: '8%', top: '12%', style: { text: '单位: %', fontSize: 10, fill: '#666' } },
+                        { type: 'text', left: '8%', bottom: '8%', style: { text: '数据来源：艾媒草莓派数据调查与计算系统', fontSize: 10, fill: '#666' } }
                     ]
                 };
             }
@@ -70,11 +75,9 @@
                 myChart.setOption(getChartOption(currentYear));
             });
 
-            // 监听窗口大小变化（适配iframe缩放）
             window.addEventListener('resize', () => myChart.resize());
         }
 
-        // 确保DOM加载完成后初始化
         document.addEventListener('DOMContentLoaded', initChart);
     </script>
 </body>
