@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>学校饭堂预制菜占比 - iframe适配版</title>
+    <style>
+        /* iframe核心适配：移除默认边距、禁止滚动、透明背景 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent; /* iframe背景透明，融入父页面 */
+            font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        /* 图表容器：适配iframe尺寸，确保居中 */
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            max-width: 400px;
+            max-height: 300px;
+            padding: 10px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+    <!-- 引入ECharts CDN（稳定版本） -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div class="chart-container">
+        <div id="chart-title" style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 5px;">2024年学校饭堂食物制作方式</div>
+        <div id="pie-chart" style="flex: 1; width: 100%; min-height: 250px;"></div>
+        <div style="font-size: 10px; color: #999; margin-top: 5px; text-align: center;">数据来源: 艾媒草莓派数据调查系统</div>
+    </div>
+
+    <script>
+        // 发送iframe高度到父窗口（适配高度）
+        function sendIframeHeight() {
+            const container = document.querySelector('.chart-container');
+            const height = container.offsetHeight;
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'chartIframeHeight',
+                    height: height
+                }, '*'); // 生产环境替换为你的域名（如https://liaokangxian.github.io）
+            }
+        }
+
+        // 延迟渲染：确保ECharts加载完成+DOM就绪
+        setTimeout(function() {
+            // 强制获取容器，兜底iframe DOM隔离问题
+            var chartDom = document.getElementById('pie-chart');
+            if (!chartDom) {
+                console.error('图表容器未找到！');
+                return;
+            }
+
+            // 初始化图表：适配iframe尺寸，背景透明
+            var myChart = echarts.init(chartDom, null, {
+                renderer: 'canvas', // 优先canvas渲染，兼容性更好
+                useDirtyRect: false // 禁用脏矩形，避免iframe内渲染异常
+            });
+            
+            // 图表配置：保留原有样式，适配iframe显示
+            var option = {
+                backgroundColor: 'transparent', // 图表背景透明，匹配iframe
+                tooltip: { 
+                    trigger: 'item',
+                    textStyle: { fontSize: 10 } // 适配iframe小尺寸
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    data: [
+                        { name: '预制菜品', value: 54.55, itemStyle: { color: '#FFD700' } },
+                        { name: '现炒菜品', value: 40.72, itemStyle: { color: '#FF8C00' } },
+                        { name: '不清楚', value: 4.73, itemStyle: { color: '#90EE90' } }
+                    ],
+                    label: { 
+                        show: true, 
+                        fontSize: 10, 
+                        formatter: '{b}: {c}%',
+                        color: '#333' // 确保文字在透明背景下可见
+                    }
+                }]
+            };
+
+            // 强制渲染图表
+            myChart.setOption(option);
+            // 初始发送iframe高度
+            sendIframeHeight();
+
+            // 点击切换年份：保留核心交互
+            myChart.getZr().on('click', function() {
+                var currentValue = myChart.getOption().series[0].data[0].value;
+                var newData = currentValue === 54.55 
+                    ? [
+                        { name: '预制菜品', value: 59.19, itemStyle: { color: '#FFD700' } },
+                        { name: '现炒菜品', value: 37.58, itemStyle: { color: '#FF8C00' } },
+                        { name: '不清楚', value: 3.23, itemStyle: { color: '#90EE90' } }
+                    ]
+                    : [
+                        { name: '预制菜品', value: 54.55, itemStyle: { color: '#FFD700' } },
+                        { name: '现炒菜品', value: 40.72, itemStyle: { color: '#FF8C00' } },
+                        { name: '不清楚', value: 4.73, itemStyle: { color: '#90EE90' } }
+                    ];
+                myChart.setOption({ series: [{ data: newData }] });
+                document.getElementById('chart-title').innerText = currentValue === 54.55 
+                    ? '2023年学校饭堂食物制作方式' 
+                    : '2024年学校饭堂食物制作方式';
+            });
+
+            // 兜底：窗口缩放/iframe尺寸变化时重绘图表
+            window.addEventListener('resize', function() {
+                myChart.resize();
+                sendIframeHeight(); // 重绘后更新高度
+            });
+
+            // 监听iframe加载完成，确保渲染
+            window.addEventListener('load', function() {
+                myChart.resize();
+                sendIframeHeight();
+            });
+        }, 800); // 合理延迟，兼顾加载速度和渲染稳定性
+    </script>
+</body>
+</html>
